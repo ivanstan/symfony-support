@@ -6,14 +6,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Ivanstan\SymfonySupport\Services\ApiEntityMetadata;
 use Ivanstan\SymfonySupport\Services\Util\DoctrineUtil;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class EntityApiNormalizer extends HydraApiNormalizer
 {
     public function __construct(
         protected EntityManagerInterface $em,
         protected UrlGeneratorInterface $router,
-        protected ObjectNormalizer $normalizer,
+        protected NormalizerInterface $normalizer,
         protected DoctrineUtil $util,
     ) {
     }
