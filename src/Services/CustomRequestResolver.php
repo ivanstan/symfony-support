@@ -7,25 +7,24 @@ use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionMethod;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class CustomRequestResolver implements ArgumentValueResolverInterface
+class CustomRequestResolver implements ValueResolverInterface
 {
     public function __construct(protected ValidatorInterface $validator, protected ContainerInterface $container)
     {
     }
 
-    public function supports(Request $request, ArgumentMetadata $argument): bool
-    {
-        return Request::class === $argument->getType() || is_subclass_of($argument->getType(), Request::class);
-    }
-
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
+        // Return empty array if this resolver doesn't support the argument
+        if (Request::class !== $argument->getType() && !is_subclass_of($argument->getType(), Request::class)) {
+            return [];
+        }
         $class = $argument->getType();
 
         /** @var AbstractRequest $customRequest */
