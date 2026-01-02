@@ -18,7 +18,7 @@ class EntityApiNormalizer extends HydraApiNormalizer
     ) {
     }
 
-    public function normalize($object, string $format = null, array $context = []): array
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         $data = parent::normalize($object, $format, $context);
 
@@ -36,7 +36,7 @@ class EntityApiNormalizer extends HydraApiNormalizer
         return array_merge($data, $normalized);
     }
 
-    protected function getEntityUrl($entity, ApiEntityMetadata $meta): ?string
+    protected function getEntityUrl(object $entity, ApiEntityMetadata $meta): ?string
     {
         $options = $meta->getApiOptions();
 
@@ -81,12 +81,19 @@ class EntityApiNormalizer extends HydraApiNormalizer
         return $data;
     }
 
-    public function supportsNormalization($data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         if (!is_object($data)) {
             return false;
         }
 
         return $this->util->isDoctrineEntity(get_class($data));
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            '*' => false,
+        ];
     }
 }

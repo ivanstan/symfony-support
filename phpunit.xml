@@ -3,6 +3,7 @@
          bootstrap="vendor/autoload.php"
          backupGlobals="false"
          colors="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd">
     <testsuites>
         <testsuite name="Project Test Suite">

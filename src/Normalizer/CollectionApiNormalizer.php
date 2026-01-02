@@ -23,7 +23,7 @@ class CollectionApiNormalizer extends HydraApiNormalizer implements NormalizerAw
      *
      * @throws ExceptionInterface
      */
-    public function normalize($object, string $format = null, array $context = []): array
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         $request = $this->getRequest($context);
 
@@ -42,8 +42,15 @@ class CollectionApiNormalizer extends HydraApiNormalizer implements NormalizerAw
         );
     }
 
-    public function supportsNormalization($data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof QueryBuilderPaginator;
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            QueryBuilderPaginator::class => true,
+        ];
     }
 }

@@ -35,7 +35,7 @@ class CollectionRequest extends AbstractRequest
         return $this->get(static::$sortDirParam, SortDirectionEnum::DESCENDING);
     }
 
-    public function getSort(string $default = null): ?string
+    public function getSort(?string $default = null): ?string
     {
         return $this->get(static::$sortParam, $default);
     }

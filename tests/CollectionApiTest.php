@@ -3,6 +3,7 @@
 use Ivanstan\SymfonySupport\Enum\SortDirectionEnum;
 use Ivanstan\SymfonySupport\Request\CollectionRequest;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Validator\Validation;
 
 class CollectionApiTest extends TestCase
 {
@@ -64,5 +65,55 @@ class CollectionApiTest extends TestCase
         $request = CollectionRequest::create('/api/items?search=test+query');
 
         self::assertEquals('test query', $request->getSearch());
+    }
+
+    public function testValidationPassesWithValidParams(): void
+    {
+        $request = CollectionRequest::create('/api/items?page=1&page-size=20&sort-dir=asc');
+        $validator = Validation::createValidator();
+
+        $violations = $request->validate($validator);
+
+        self::assertCount(0, $violations);
+    }
+
+    public function testValidationFailsWithInvalidPage(): void
+    {
+        $request = CollectionRequest::create('/api/items?page=0');
+        $validator = Validation::createValidator();
+
+        $violations = $request->validate($validator);
+
+        self::assertGreaterThan(0, $violations->count());
+    }
+
+    public function testValidationFailsWithNegativePageSize(): void
+    {
+        $request = CollectionRequest::create('/api/items?page-size=-5');
+        $validator = Validation::createValidator();
+
+        $violations = $request->validate($validator);
+
+        self::assertGreaterThan(0, $violations->count());
+    }
+
+    public function testValidationFailsWithExcessivePageSize(): void
+    {
+        $request = CollectionRequest::create('/api/items?page-size=150');
+        $validator = Validation::createValidator();
+
+        $violations = $request->validate($validator);
+
+        self::assertGreaterThan(0, $violations->count());
+    }
+
+    public function testValidationFailsWithInvalidSortDirection(): void
+    {
+        $request = CollectionRequest::create('/api/items?sort-dir=invalid');
+        $validator = Validation::createValidator();
+
+        $violations = $request->validate($validator);
+
+        self::assertGreaterThan(0, $violations->count());
     }
 }
