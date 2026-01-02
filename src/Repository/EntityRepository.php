@@ -11,20 +11,30 @@ class EntityRepository extends ServiceEntityRepository
 {
     protected const SEARCH_QUERY_PARAM = 'search';
 
-    protected ApiEntityMetadata $meta;
+    protected ?ApiEntityMetadata $meta = null;
+
+    private string $entityClassName;
 
     public function __construct(ManagerRegistry $registry, string $entityClass)
     {
         parent::__construct($registry, $entityClass);
+        $this->entityClassName = $entityClass;
+    }
 
-        $this->meta = new ApiEntityMetadata($this->_em->getClassMetadata($entityClass));
+    protected function getMeta(): ApiEntityMetadata
+    {
+        if ($this->meta === null) {
+            $this->meta = new ApiEntityMetadata($this->getEntityManager()->getClassMetadata($this->entityClassName));
+        }
+
+        return $this->meta;
     }
 
     public function get(string $entity, string $id)
     {
-        $builder = $this->_em->createQueryBuilder();
-        $identifier = $this->meta->getIdentifier();
-        $alias = $this->meta->getAlias();
+        $builder = $this->getEntityManager()->createQueryBuilder();
+        $identifier = $this->getMeta()->getIdentifier();
+        $alias = $this->getMeta()->getAlias();
 
         $builder->select($alias);
         $builder->from($entity, $alias);
