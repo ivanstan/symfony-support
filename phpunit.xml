@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="vendor/autoload.php" backupGlobals="false"
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         bootstrap="vendor/autoload.php"
+         backupGlobals="false"
          colors="true"
-         convertWarningsToExceptions="true"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
-    <coverage pathCoverage="true">
-        <include>
-            <directory suffix=".php">src/</directory>
-        </include>
-        <exclude>
-            <directory suffix=".php">src/Field</directory>
-            <directory suffix=".php">src/DependencyInjection</directory>
-        </exclude>
-    </coverage>
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd">
     <testsuites>
         <testsuite name="Project Test Suite">
             <directory>tests</directory>
@@ -20,4 +12,13 @@
     <php>
         <env name="APP_ENV" value="test"/>
     </php>
+    <source>
+        <include>
+            <directory suffix=".php">src/</directory>
+        </include>
+        <exclude>
+            <directory suffix=".php">src/Field</directory>
+            <directory suffix=".php">src/DependencyInjection</directory>
+        </exclude>
+    </source>
 </phpunit>

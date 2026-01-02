@@ -2,7 +2,7 @@
 
 use Ivanstan\SymfonySupport\EventSubscriber\ApiExceptionSubscriber;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -67,12 +67,20 @@ class ApiExceptionSubscriberTest extends TestCase
         return new ExceptionEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $e);
     }
 
-    protected function parameterBagFactory(string $env, array $paths): ParameterBag
+    protected function parameterBagFactory(string $env, array $paths): ParameterBagInterface
     {
-        $params = $this->createMock(ParameterBag::class);
+        $params = $this->createMock(ParameterBagInterface::class);
+        $params->method('has')
+            ->willReturnCallback(fn(string $key) => match ($key) {
+                'symfony_support.exception_subscriber' => count($paths) > 0,
+                default => false,
+            });
         $params->method('get')
-            ->withConsecutive(['kernel.environment'], ['symfony_rest.exception_subscriber'])
-            ->willReturnOnConsecutiveCalls($env, ['paths' => $paths]);
+            ->willReturnCallback(fn(string $key) => match ($key) {
+                'kernel.environment' => $env,
+                'symfony_support.exception_subscriber' => ['paths' => $paths],
+                default => null,
+            });
 
         return $params;
     }

@@ -73,7 +73,7 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
 
     protected function isDev(): bool
     {
-        return in_array($this->env, ['dev', 'test', 'testing']);
+        return in_array($this->env, ['dev', 'test', 'testing'], true);
     }
 
     protected function throwableToArray(\Throwable $throwable): array
