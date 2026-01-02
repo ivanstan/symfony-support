@@ -28,9 +28,9 @@ class EntityApiNormalizerTest extends TestCase
         $this->entityNormalizer = new EntityApiNormalizer(
             $this->em,
             $this->router,
-            $this->normalizer,
             $this->util
         );
+        $this->entityNormalizer->setNormalizer($this->normalizer);
     }
 
     public function testNormalizeReturnsHydraContextAndEntityData(): void
@@ -169,6 +169,25 @@ class EntityApiNormalizerTest extends TestCase
         self::assertFalse($this->entityNormalizer->supportsNormalization(123));
         self::assertFalse($this->entityNormalizer->supportsNormalization(['array']));
         self::assertFalse($this->entityNormalizer->supportsNormalization(null));
+    }
+
+    public function testSupportsNormalizationReturnsFalseWhenAlreadyNormalizing(): void
+    {
+        $entity = new TestEntity(1, 'Test');
+
+        $this->util->method('isDoctrineEntity')
+            ->with(TestEntity::class)
+            ->willReturn(true);
+
+        // Without context flag, should return true
+        self::assertTrue($this->entityNormalizer->supportsNormalization($entity));
+
+        // With context flag set (during delegation), should return false to prevent recursion
+        self::assertFalse($this->entityNormalizer->supportsNormalization(
+            $entity,
+            null,
+            [EntityApiNormalizer::class => true]
+        ));
     }
 
     public function testGetSupportedTypes(): void

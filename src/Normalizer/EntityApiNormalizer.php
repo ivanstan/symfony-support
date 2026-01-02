@@ -6,14 +6,16 @@ use Doctrine\ORM\EntityManagerInterface;
 use Ivanstan\SymfonySupport\Services\ApiEntityMetadata;
 use Ivanstan\SymfonySupport\Services\Util\DoctrineUtil;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 
-class EntityApiNormalizer extends HydraApiNormalizer
+class EntityApiNormalizer extends HydraApiNormalizer implements NormalizerAwareInterface
 {
+    use NormalizerAwareTrait;
+
     public function __construct(
         protected EntityManagerInterface $em,
         protected UrlGeneratorInterface $router,
-        protected NormalizerInterface $normalizer,
         protected DoctrineUtil $util,
     ) {
     }
@@ -27,6 +29,8 @@ class EntityApiNormalizer extends HydraApiNormalizer
         $data['@id'] = $this->getEntityUrl($object, $metadata);
         $data['@type'] = $metadata->getName();
 
+        // Mark as already normalized to prevent infinite recursion
+        $context[self::class] = true;
         $normalized = $this->normalizer->normalize($object, $format, $context);
 
         if (($context['meta'] ?? false) === true) {
@@ -83,6 +87,11 @@ class EntityApiNormalizer extends HydraApiNormalizer
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
+        // Prevent infinite recursion when delegating to the serializer
+        if (isset($context[self::class])) {
+            return false;
+        }
+
         if (!is_object($data)) {
             return false;
         }
